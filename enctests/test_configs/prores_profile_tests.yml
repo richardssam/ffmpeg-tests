@@ -1,0 +1,77 @@
+
+test_prores_profile:
+    name: test_prores_profile
+    description: variations of colorspace yuv420p
+    app: ffmpeg
+    suffix: .mov
+    encoding_template: 'ffmpeg {input_args} -i "{source}" -vframes {duration} {encoding_args} -y "{outfile}"'
+    wedges:
+        proxy: &base_args2
+            -c:v: prores_ks
+            -profile:v: proxy
+            -pix_fmt: yuv422p10le
+            -color_range: tv
+            -colorspace: bt709
+            -color_primaries: bt709
+            -color_trc: iec61966-2-1 
+
+        lt:
+            << : *base_args2
+            -profile:v: proxy
+
+        standard:
+            << : *base_args2
+            -profile:v: standard
+
+        hq:
+            << : *base_args2
+            -profile:v: hq
+
+        t4444:
+            << : *base_args2
+            -profile:v: 4444
+            -pix_fmt: yuv444p10le
+
+        t4444xq:
+            << : *base_args2
+            -profile:v: 4444xq
+            -pix_fmt: yuv444p10le
+
+---
+
+
+reports:
+    graphs:
+    - args:
+        color: -profile:v
+        height: 400
+        barmode: group
+        x: media
+        y: vmaf_harmonic_mean
+        range_y:  
+            - 90
+            - 100
+      name: vmaf_harmonic_mean.png
+      type: bar
+    - args:
+        color: -profile:v
+        height: 400
+        x: media
+        barmode: group
+        y: encode_time
+      name: encode_time.png
+      type: bar
+    - args:
+        color: -profile:v
+        height: 400
+        x: media
+        barmode: group
+        y: filesize
+      name: filesize.png
+      type: bar
+    name: prores-profile-test
+    title: Prores Profile Comparison
+    description: This is a comparison of different profile values for prores encoding.
+    directory: prores-profile-encode
+    templatefile: basic.html.jinja
+
